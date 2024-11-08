@@ -38,7 +38,14 @@ public class ContactServlet extends HttpServlet {
 			handleList(request, response);
 		} else if ("newContact".equals(action)) {
 			handleSaveContact(request, response);
+		} else if ("getForm".equals(action)) {
+			handleForm(request, response);
 		}
+	}
+
+	private void handleForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		var dispatcher = request.getRequestDispatcher("contact_form.jsp");
+		dispatcher.forward(request, response);
 	}
 
 	private void handleSaveContact(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
