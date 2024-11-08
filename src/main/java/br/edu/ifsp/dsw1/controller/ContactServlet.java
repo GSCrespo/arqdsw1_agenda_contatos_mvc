@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 import br.edu.ifsp.dsw1.model.dao.ContactDao;
 import br.edu.ifsp.dsw1.model.entity.Contact;
@@ -23,8 +24,10 @@ public class ContactServlet extends HttpServlet {
 	}
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		List<Contact> contacts = dao.retrieve();
+		request.setAttribute("contacts", contacts);
+		var dispatcher = request.getRequestDispatcher("contacts.jsp");
+		dispatcher.forward(request, response);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
