@@ -7,13 +7,7 @@
 
 	<jsp:include page="/includes/navBar.jsp" />
 
-	<div class="container text-center">
-		<div class="row align-items-center">
-			<div class="col align-items-center">
-				<img src="images/dsw1.png" alt="Imagem da disciplina">
-			</div>
-		</div>
-	</div>
+	
 
 	<jsp:include page="/includes/scripts.html" />
 </body>
