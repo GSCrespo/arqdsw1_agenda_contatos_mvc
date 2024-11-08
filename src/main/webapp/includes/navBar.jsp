@@ -16,7 +16,7 @@
 					aria-current="page" href="#">Home</a></li>
 				<li class="nav-item"><a class="nav-link" href="index.do">Novo
 						Contato</a></li>
-				<li class="nav-item"><a class="nav-link" href="contact.do">Contatos</a></li>
+				<li class="nav-item"><a class="nav-link" href="contact.do?action=list">Contatos</a></li>
 			</ul>
 		</div>
 	</div>

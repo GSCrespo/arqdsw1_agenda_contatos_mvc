@@ -24,7 +24,7 @@
 		}
 		%>
 
-		<form class="bg-white p-4 rounded-3 shadow" action="contact.do"
+		<form class="bg-white p-4 rounded-3 shadow" action="contact.do?action=newContact"
 			method="post">
 			<div class="mb-3">
 				<label for="name" class="form-label">Nome</label> <input type="text"

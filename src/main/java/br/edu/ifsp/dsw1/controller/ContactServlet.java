@@ -24,13 +24,24 @@ public class ContactServlet extends HttpServlet {
 	}
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		List<Contact> contacts = dao.retrieve();
-		request.setAttribute("contacts", contacts);
-		var dispatcher = request.getRequestDispatcher("contacts.jsp");
-		dispatcher.forward(request, response);
+		processRequest(request, response);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		processRequest(request, response);
+	}
+
+	private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String action = request.getParameter("action");
+		
+		if ("list".equals(action)) {
+			handleList(request, response);
+		} else if ("newContact".equals(action)) {
+			handleSaveContact(request, response);
+		}
+	}
+
+	private void handleSaveContact(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		var name = request.getParameter("textName");
 		var fone = request.getParameter("textFone");
 		var email = request.getParameter("textEmail");
@@ -50,6 +61,13 @@ public class ContactServlet extends HttpServlet {
 		
 		var dispatcher = request.getRequestDispatcher("contact_form.jsp");
 		dispatcher.forward(request, response);
+		
 	}
 
+	private void handleList(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		List<Contact> contacts = dao.retrieve();
+		request.setAttribute("contacts", contacts);
+		var dispatcher = request.getRequestDispatcher("contacts.jsp");
+		dispatcher.forward(request, response);
+	}
 }
