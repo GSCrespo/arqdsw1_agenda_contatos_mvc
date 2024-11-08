@@ -36,7 +36,10 @@
 					<td><%= contact.getFone() %></td>
 					<td><%= contact.getEmail() %></td>
 				</tr>
-			<%} %>
+			<%
+			i+=1;
+			} 
+			%>
 			</tbody>
 		</table>
 
