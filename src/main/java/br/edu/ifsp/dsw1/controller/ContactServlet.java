@@ -30,25 +30,30 @@ public class ContactServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		processRequest(request, response);
 	}
-
+	
 	private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String action = request.getParameter("action");
+		String view;
 		
 		if ("list".equals(action)) {
-			handleList(request, response);
+			view = handleList(request, response);
 		} else if ("newContact".equals(action)) {
-			handleSaveContact(request, response);
+			view = handleSaveContact(request, response);
 		} else if ("getForm".equals(action)) {
-			handleForm(request, response);
+			view = handleForm(request, response);
+		} else {
+			view = "index.jsp";
 		}
-	}
-
-	private void handleForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		var dispatcher = request.getRequestDispatcher("contact_form.jsp");
+		
+		var dispatcher = request.getRequestDispatcher(view);
 		dispatcher.forward(request, response);
 	}
 
-	private void handleSaveContact(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private String handleForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		return "contact_form.jsp";
+	}
+
+	private String handleSaveContact(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		var name = request.getParameter("textName");
 		var fone = request.getParameter("textFone");
 		var email = request.getParameter("textEmail");
@@ -66,15 +71,13 @@ public class ContactServlet extends HttpServlet {
 		request.setAttribute("message", message);
 		request.setAttribute("saved", saved);
 		
-		var dispatcher = request.getRequestDispatcher("contact_form.jsp");
-		dispatcher.forward(request, response);
-		
+		return "contact_form.jsp";		
 	}
 
-	private void handleList(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private String handleList(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		List<Contact> contacts = dao.retrieve();
 		request.setAttribute("contacts", contacts);
-		var dispatcher = request.getRequestDispatcher("contacts.jsp");
-		dispatcher.forward(request, response);
+		
+		return "contacts.jsp";
 	}
 }
