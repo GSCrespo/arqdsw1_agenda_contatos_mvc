@@ -2,11 +2,12 @@ package br.edu.ifsp.dsw1.controller.command;
 
 import java.io.IOException;
 
+import br.edu.ifsp.dsw1.model.dao.ContactDao;
+import br.edu.ifsp.dsw1.model.dao.MonostateContactDao;
+import br.edu.ifsp.dsw1.model.entity.Contact;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import br.edu.ifsp.dsw1.model.dao.ContactDao;
-import br.edu.ifsp.dsw1.model.entity.Contact;
 
 
 public class SaveContactCommand implements Command {
@@ -17,7 +18,7 @@ public class SaveContactCommand implements Command {
 		var name = request.getParameter("textName");
 		var fone = request.getParameter("textFone");
 		var email = request.getParameter("textEmail");
-		ContactDao dao = new ContactDao();
+		ContactDao dao = new MonostateContactDao();
 		
 		Contact contact = new Contact(name, fone, email);
 		boolean saved = dao.create(contact);
