@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.edu.ifsp.dsw1.model.entity.Contact;
 
-public class JsonContactDao implements ContactDao {
+class JsonContactDao implements ContactDao {
 	
 	private File file;
 	private final ObjectMapper mapper;

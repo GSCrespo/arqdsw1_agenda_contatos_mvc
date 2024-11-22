@@ -15,7 +15,7 @@ import br.edu.ifsp.dsw1.model.entity.Contact;
  * que é um atributo de classe, de forma que todas as instancias
  * tem acesso a mesma lista.
  */
-public class MonostateContactDao implements ContactDao{
+class MonostateContactDao implements ContactDao{
 	private static List<Contact> datasource;
 	
 	
