@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import br.edu.ifsp.dsw1.model.dao.ContactDao;
-import br.edu.ifsp.dsw1.model.dao.MonostateContactDao;
+import br.edu.ifsp.dsw1.model.dao.JsonContactDao;
 import br.edu.ifsp.dsw1.model.entity.Contact;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +17,7 @@ public class ListContactsCommand implements Command {
 	public String execute(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		
-		ContactDao dao = new MonostateContactDao();
+		ContactDao dao = new JsonContactDao();
 		List<Contact> contacts = dao.retrieve();
 		request.setAttribute("contacts", contacts);
 		

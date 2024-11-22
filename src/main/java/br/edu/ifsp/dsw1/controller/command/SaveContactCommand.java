@@ -3,7 +3,7 @@ package br.edu.ifsp.dsw1.controller.command;
 import java.io.IOException;
 
 import br.edu.ifsp.dsw1.model.dao.ContactDao;
-import br.edu.ifsp.dsw1.model.dao.MonostateContactDao;
+import br.edu.ifsp.dsw1.model.dao.JsonContactDao;
 import br.edu.ifsp.dsw1.model.entity.Contact;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,7 +18,7 @@ public class SaveContactCommand implements Command {
 		var name = request.getParameter("textName");
 		var fone = request.getParameter("textFone");
 		var email = request.getParameter("textEmail");
-		ContactDao dao = new MonostateContactDao();
+		ContactDao dao = new JsonContactDao();
 		
 		Contact contact = new Contact(name, fone, email);
 		boolean saved = dao.create(contact);
