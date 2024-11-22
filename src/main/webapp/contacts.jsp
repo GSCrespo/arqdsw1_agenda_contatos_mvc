@@ -23,6 +23,7 @@
 					<th scope="col">Nome</th>
 					<th scope="col">Telefone</th>
 					<th scope="col">E-mail</th>
+					<th scope="col">Ações</th>
 				</tr>
 			</thead>
 			<tbody class="table-group-divider">
@@ -35,6 +36,7 @@
 					<td><%= contact.getName() %></td>
 					<td><%= contact.getFone() %></td>
 					<td><%= contact.getEmail() %></td>
+					<td><a href=contact.do?action=delete&email=<%=contact.getEmail() %> onclick="return confirm('Confirma a exclusão?')" class="btn btn-outline-danger">Apagar</a></td>
 				</tr>
 			<%
 			i+=1;
