@@ -4,7 +4,7 @@ public class ContactDaoFactory {
 	private ContactDaoType type;
 	
 	public ContactDaoFactory() { 
-		type = ContactDaoType.JSON;
+		type = ContactDaoType.DATABASE;
 	}
 	
 	public ContactDaoFactory(ContactDaoType type) {
@@ -17,12 +17,14 @@ public class ContactDaoFactory {
 				return new MonostateContactDao();
 			case JSON:
 				return new JsonContactDao();
+			case DATABASE:
+				return new DatabaseContactDao();
 			default:
 				throw new IllegalArgumentException("Tipo de contato desconhecido: " + type);
 		}
 	}
 
 	public enum ContactDaoType {
-		MONOSTATE, JSON
+		MONOSTATE, JSON, DATABASE
 	}
 }
