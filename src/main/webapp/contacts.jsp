@@ -32,7 +32,7 @@
 				<h5>Buscar contato</h5>
 				<form action="contact.do?action=searchContact" method="post">
 					<div class="input-group mb-3">
-						<input type="text" class="form-control" name="textEmail" placeholder="E-mail do contato">
+						<input type="text" class="form-control" name="textName" placeholder="Nome do contato">
 						<button class="btn btn-outline-warning" type="submit" id="button-addon2">Buscar</button>
 					</div>
 				</form>
