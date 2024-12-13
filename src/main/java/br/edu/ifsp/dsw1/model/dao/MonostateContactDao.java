@@ -86,4 +86,9 @@ class MonostateContactDao implements ContactDao{
 		
 		return datasource.remove(inDatasouce);
 	}
+	
+	@Override
+	public List<Contact> findByName(String name) {
+		return null;
+	}
 }

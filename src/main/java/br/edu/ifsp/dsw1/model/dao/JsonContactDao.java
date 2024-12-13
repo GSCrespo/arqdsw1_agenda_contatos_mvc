@@ -101,6 +101,11 @@ class JsonContactDao implements ContactDao {
 		return false;
 		
 	}
+	
+	@Override
+	public List<Contact> findByName(String name) {
+		return null;
+	}
 
 	private void readJsonFile() {
 		try {
