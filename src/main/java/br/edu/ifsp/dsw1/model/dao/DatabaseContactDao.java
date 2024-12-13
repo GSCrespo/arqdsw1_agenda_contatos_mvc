@@ -1,5 +1,7 @@
 package br.edu.ifsp.dsw1.model.dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -9,26 +11,60 @@ import br.edu.ifsp.dsw1.model.dao.connection.ContactsDatabaseConnection;
 import br.edu.ifsp.dsw1.model.entity.Contact;
 
 public class DatabaseContactDao implements ContactDao {
+	private static Connection conn;
+	
+	private static PreparedStatement insertPreparedStatement;
+	private static PreparedStatement selectByEmailPreparedStatement;
+	private static PreparedStatement selectByNamePreparedStatement;
+	private static PreparedStatement selectAllPreparedStatement;
+	private static PreparedStatement updatePreparedStatement;
+	private static PreparedStatement deletePreparedStatement;
+	
+	
+	public DatabaseContactDao() {
+		
+		try {
+			if (conn == null) {
+				conn = ContactsDatabaseConnection.getConnection();
+			
+				var sql = "INSERT INTO tb_contacts (name, fone, email) VALUES (?, ?, ?)";
+				insertPreparedStatement = conn.prepareStatement(sql);
+				
+				sql = "SELECT * FROM tb_contacts WHERE email = ?";
+				selectByEmailPreparedStatement = conn.prepareStatement(sql);
+				
+				sql = "SELECT * FROM tb_contacts WHERE name LIKE ? ORDER BY name";
+				selectByNamePreparedStatement = conn.prepareStatement(sql);
+				
+				sql = "SELECT * FROM tb_contacts ORDER BY name";
+				selectAllPreparedStatement = conn.prepareStatement(sql);
+				
+				sql = "UPDATE tb_contacts SET name = ?, fone = ?, email = ? WHERE email = ?";
+				updatePreparedStatement = conn.prepareStatement(sql);
+				
+				sql = "DELETE FROM tb_contacts WHERE email = ?";
+				deletePreparedStatement = conn.prepareStatement(sql);
+			}
+			
+		} catch (SQLException sqlException) {
+			sqlException.printStackTrace();
+		}
+	}
+	
 
 	@Override
 	public boolean create(Contact contact) {
 		if (contact != null) {
-			var sql = "INSERT INTO tb_contacts (name, fone, email) VALUES ('" 
-					+ contact.getName() + "', '" 
-					+ contact.getFone() + "', '"
-					+ contact.getEmail() + "')";
+			
 			
 			int rows = -1;
 			try {
-				var connection = ContactsDatabaseConnection.getConnection();
-				var statement = connection.createStatement();
+				insertPreparedStatement.setString(1, contact.getName());
+				insertPreparedStatement.setString(2, contact.getFone());
+				insertPreparedStatement.setString(3, contact.getEmail());
+				rows = insertPreparedStatement.executeUpdate();
 				
-				rows = statement.executeUpdate(sql);
-				
-				statement.close();
-				connection.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
@@ -41,25 +77,17 @@ public class DatabaseContactDao implements ContactDao {
 	public Contact retrieve(String email) {
 		Contact contact = null;
 		if (email !=  null && !email.isEmpty() ) {
-			var sql = "SELECT * FROM tb_contacts WHERE email = '" + email + "'";
-			
 			try {
-				var connection = ContactsDatabaseConnection.getConnection();
-				var statement = connection.createStatement();
-				
-				ResultSet result = statement.executeQuery(sql);
-				
+				selectByEmailPreparedStatement.setString(1, email);
+					
+				ResultSet result = selectByEmailPreparedStatement.executeQuery();
 				if (result.next()) {
 					contact = new Contact();
 					contact.setEmail(result.getString("email"));
 					contact.setFone(result.getString("fone"));
 					contact.setName(result.getString("name"));
 				}
-				
-				statement.close();
-				connection.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -69,13 +97,9 @@ public class DatabaseContactDao implements ContactDao {
 	@Override
 	public List<Contact> retrieve() {
 		List<Contact> contacts = new LinkedList<Contact>();
-		var sql = "SELECT * FROM tb_contacts ORDER BY name";
 		
 		try {
-			var connection = ContactsDatabaseConnection.getConnection();
-			var statement = connection.createStatement();
-			
-			var result = statement.executeQuery(sql);
+			var result = selectAllPreparedStatement.executeQuery();
 			
 			while(result.next()) {
 				var contact = new Contact();
@@ -84,36 +108,55 @@ public class DatabaseContactDao implements ContactDao {
 				contact.setName(result.getString("name"));
 				contacts.add(contact);
 			}
-			
-			statement.close();
-			connection.close();
 		} catch (SQLException e) {
-			// TODO: handle exception
+			e.printStackTrace();
 		}
 		
 		return contacts;
 	}
 
 	@Override
+	public List<Contact> findByName(String name) {
+		var contacts = new LinkedList<Contact>();
+		if (name != null && !name.isEmpty()) {
+			try {
+				/**
+				 * Como o objetivo é usar o LIKE e usar coringas antes de depois do 
+				 * parâmetro, insere-se os coringas no parâmetro para ser definido 
+				 * no PreparedStatement.
+				 */
+				name = "%" + name + "%";
+				selectByNamePreparedStatement.setString(1, name);
+				var result = selectByNamePreparedStatement.executeQuery();
+				
+				while(result.next()) {
+					var contact = new Contact();
+					contact.setEmail(result.getString("email"));
+					contact.setFone(result.getString("fone"));
+					contact.setName(result.getString("name"));
+					contacts.add(contact);
+				}	
+			} catch (SQLException sqlEx) {
+				sqlEx.printStackTrace();
+				contacts = new LinkedList<Contact>();
+			}
+		}
+		return contacts;
+	}
+
+	@Override
 	public boolean update(Contact updatedContact, String oldEmail) {
 		if (updatedContact != null && !oldEmail.isEmpty()) {
-			var sql = "UPDATE tb_contacts SET " +
-					"name = '" + updatedContact.getName() + "', " +
-					"fone = '" + updatedContact.getFone() + "', " +
-					"email = '" + updatedContact.getEmail() + "' " +
-					"WHERE email = '" + oldEmail + "'";
-			
 			int rows = -1;
 			try {
-				var connection = ContactsDatabaseConnection.getConnection();
-				var statement = connection.createStatement();
+				updatePreparedStatement.setString(1, updatedContact.getName());
+				updatePreparedStatement.setString(2, updatedContact.getFone());
+				updatePreparedStatement.setString(3, updatedContact.getEmail());
+				updatePreparedStatement.setString(4, oldEmail);
 				
-				rows = statement.executeUpdate(sql);
-				
-				statement.close();
-				connection.close();
+				rows = updatePreparedStatement.executeUpdate();
 			} catch (SQLException e) {
-				// TODO: handle exception
+				e.printStackTrace();
 			}
 			return rows > 0;
 		}
@@ -123,48 +166,17 @@ public class DatabaseContactDao implements ContactDao {
 	@Override
 	public boolean delete(Contact contact) {
 		if (contact != null) {
-			var sql = "DELETE FROM tb_contacts WHERE email = '" + contact.getEmail() + "'";
 			int rows = -1;
 			try {
-				var connection = ContactsDatabaseConnection.getConnection();
-				var statement = connection.createStatement();
+				deletePreparedStatement.setString(1, contact.getEmail());
 				
-				rows = statement.executeUpdate(sql);
-				
-				statement.close();
-				connection.close();
+				rows = deletePreparedStatement.executeUpdate();
 			} catch (SQLException e) {
-				// TODO: handle exception
+				e.printStackTrace();
 			}
 			return rows > 0;
 		}
 		return false;
 	}
 
-	@Override
-	public List<Contact> findByName(String name) {
-		var contacts = new LinkedList<Contact>();
-		if (name != null && !name.isEmpty()) {
-			var sql = "SELECT * FROM tb_contacts WHERE name LIKE '%" + name + "%' ORDER BY name";
-			
-			try(var conn = ContactsDatabaseConnection.getConnection();
-				var stm = conn.createStatement()) {
-				
-				var result = stm.executeQuery(sql);
-				
-				while(result.next()) {
-					var contact = new Contact();
-					contact.setEmail(result.getString("email"));
-					contact.setFone(result.getString("fone"));
-					contact.setName(result.getString("name"));
-					contacts.add(contact);
-				}
-				
-			} catch (SQLException sqlEx) {
-				sqlEx.printStackTrace();
-				contacts = new LinkedList<Contact>();
-			}
-		}
-		return contacts;
-	}
 }
