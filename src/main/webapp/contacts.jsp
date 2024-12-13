@@ -9,12 +9,37 @@
 	<jsp:include page="includes/navBar.jsp" />
 
 	<%
-	var contacts = (List<Contact>)request.getAttribute("contacts");
-	if (contacts == null) {
+	var contacts = (List<Contact>) request.getAttribute("contacts");
+	if (contacts == null || contacts.isEmpty()) {
 		response.sendRedirect("index.jsp");
 	} else {
 	%>
 	<main class="container-sm flex-grow-1  justify-content-center">
+
+		<!-- Tratamento da mensagem de erro caso a busca não tenha sucesso. -->
+		<%
+		String msg = (String) request.getAttribute("errorMessage");
+		if (msg != null ) {
+			out.println("<div class=\"alert alert-danger alert-dismissible fade show\" role=\"alert\">");
+			out.println(msg);
+			out.println("<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>");
+		}
+		%>
+
+		<!-- Formulário para buscar um contato pelo nome. -->
+		<div class="card" style="margin-top: 24px;">
+			<div class="card-body">
+				<h5>Buscar contato</h5>
+				<form action="contact.do?action=searchContact" method="post">
+					<div class="input-group mb-3">
+						<input type="text" class="form-control" name="textEmail" placeholder="E-mail do contato">
+						<button class="btn btn-outline-warning" type="submit" id="button-addon2">Buscar</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+
 		<h1 style="text-align: center; margin: 30px;">Contatos Cadastrados</h1>
 		<table class="table">
 			<thead>
@@ -36,10 +61,14 @@
 					<td><%= contact.getName() %></td>
 					<td><%= contact.getFone() %></td>
 					<td><%= contact.getEmail() %></td>
-					<td><a href=contact.do?action=delete&email=<%=contact.getEmail() %> onclick="return confirm('Confirma a exclusão?')" class="btn btn-outline-danger">Apagar</a></td>
+					<td>
+						<a class="btn btn-outline-danger" 
+						onclick="return confirm('Confirma a exclusão?');" 
+						href="contact.do?action=delete&email=<%=contact.getEmail()%>" >
+						Apagar</a>
+					</td>
 				</tr>
-			<%
-			i+=1;
+			<%	i += 1;
 			} 
 			%>
 			</tbody>

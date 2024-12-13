@@ -32,8 +32,10 @@ public class ContactServlet extends HttpServlet {
 			command = new SaveContactCommand();
 		} else if ("getForm".equals(action)) {
 			command = new FormContactCommand();
-		} else if ("delete".equals(action)) {
+		}else if ("delete".equals(action)) {
 			command = new DeleteContactCommand();
+		}else if("searchContact".equals(action)) {
+			command = new SearchContactCommand();
 		} else {
 			command = new ErrorCommand();
 		}
