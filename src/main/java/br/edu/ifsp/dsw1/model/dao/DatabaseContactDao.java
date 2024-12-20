@@ -1,7 +1,5 @@
 package br.edu.ifsp.dsw1.model.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -11,54 +9,13 @@ import br.edu.ifsp.dsw1.model.dao.connection.ContactsDatabaseConnection;
 import br.edu.ifsp.dsw1.model.entity.Contact;
 
 public class DatabaseContactDao implements ContactDao {
-	private static Connection conn;
 	
-	private static PreparedStatement insertPreparedStatement;
-	private static PreparedStatement selectByEmailPreparedStatement;
-	private static PreparedStatement selectByNamePreparedStatement;
-	private static PreparedStatement selectAllPreparedStatement;
-	private static PreparedStatement updatePreparedStatement;
-	private static PreparedStatement deletePreparedStatement;
-	
-	
-	public DatabaseContactDao() {
-		
-		try {
-			if (conn == null) {
-				conn = ContactsDatabaseConnection.getConnection();
-			
-				var sql = "INSERT INTO tb_contacts (name, fone, email) VALUES (?, ?, ?)";
-				insertPreparedStatement = conn.prepareStatement(sql);
-				
-				sql = "SELECT * FROM tb_contacts WHERE email = ?";
-				selectByEmailPreparedStatement = conn.prepareStatement(sql);
-				
-				sql = "SELECT * FROM tb_contacts WHERE name LIKE ? ORDER BY name";
-				selectByNamePreparedStatement = conn.prepareStatement(sql);
-				
-				sql = "SELECT * FROM tb_contacts ORDER BY name";
-				selectAllPreparedStatement = conn.prepareStatement(sql);
-				
-				sql = "UPDATE tb_contacts SET name = ?, fone = ?, email = ? WHERE email = ?";
-				updatePreparedStatement = conn.prepareStatement(sql);
-				
-				sql = "DELETE FROM tb_contacts WHERE email = ?";
-				deletePreparedStatement = conn.prepareStatement(sql);
-			}
-			
-		} catch (SQLException sqlException) {
-			sqlException.printStackTrace();
-		}
-	}
-	
-
-	@Override
 	public boolean create(Contact contact) {
+		var sql = "INSERT INTO tb_contacts (name, fone, email) VALUES (?, ?, ?)";
 		if (contact != null) {
-			
-			
 			int rows = -1;
-			try {
+			try (var conn = ContactsDatabaseConnection.getConnection();
+				 var insertPreparedStatement = conn.prepareStatement(sql)){
 				insertPreparedStatement.setString(1, contact.getName());
 				insertPreparedStatement.setString(2, contact.getFone());
 				insertPreparedStatement.setString(3, contact.getEmail());
@@ -75,9 +32,11 @@ public class DatabaseContactDao implements ContactDao {
 
 	@Override
 	public Contact retrieve(String email) {
+		var sql = "SELECT * FROM tb_contacts WHERE email = ?";
 		Contact contact = null;
 		if (email !=  null && !email.isEmpty() ) {
-			try {
+			try(var conn = ContactsDatabaseConnection.getConnection();
+				var selectByEmailPreparedStatement = conn.prepareStatement(sql)) {
 				selectByEmailPreparedStatement.setString(1, email);
 					
 				ResultSet result = selectByEmailPreparedStatement.executeQuery();
@@ -97,8 +56,10 @@ public class DatabaseContactDao implements ContactDao {
 	@Override
 	public List<Contact> retrieve() {
 		List<Contact> contacts = new LinkedList<Contact>();
+		var sql = "SELECT * FROM tb_contacts ORDER BY name";
 		
-		try {
+		try(var conn = ContactsDatabaseConnection.getConnection();
+			var selectAllPreparedStatement = conn.prepareStatement(sql)) {
 			var result = selectAllPreparedStatement.executeQuery();
 			
 			while(result.next()) {
@@ -118,8 +79,10 @@ public class DatabaseContactDao implements ContactDao {
 	@Override
 	public List<Contact> findByName(String name) {
 		var contacts = new LinkedList<Contact>();
+		var sql = "SELECT * FROM tb_contacts WHERE name LIKE ? ORDER BY name";
 		if (name != null && !name.isEmpty()) {
-			try {
+			try(var conn = ContactsDatabaseConnection.getConnection();
+					var selectByNamePreparedStatement = conn.prepareStatement(sql)) {
 				/**
 				 * Como o objetivo é usar o LIKE e usar coringas antes de depois do 
 				 * parâmetro, insere-se os coringas no parâmetro para ser definido 
@@ -146,9 +109,11 @@ public class DatabaseContactDao implements ContactDao {
 
 	@Override
 	public boolean update(Contact updatedContact, String oldEmail) {
+		var sql = "UPDATE tb_contacts SET name = ?, fone = ?, email = ? WHERE email = ?";
 		if (updatedContact != null && !oldEmail.isEmpty()) {
 			int rows = -1;
-			try {
+			try(var conn = ContactsDatabaseConnection.getConnection();
+					var updatePreparedStatement = conn.prepareStatement(sql)) {
 				updatePreparedStatement.setString(1, updatedContact.getName());
 				updatePreparedStatement.setString(2, updatedContact.getFone());
 				updatePreparedStatement.setString(3, updatedContact.getEmail());
@@ -165,9 +130,11 @@ public class DatabaseContactDao implements ContactDao {
 
 	@Override
 	public boolean delete(Contact contact) {
+		var sql = "DELETE FROM tb_contacts WHERE email = ?";
 		if (contact != null) {
 			int rows = -1;
-			try {
+			try(var conn = ContactsDatabaseConnection.getConnection();
+					var deletePreparedStatement = conn.prepareStatement(sql)) {
 				deletePreparedStatement.setString(1, contact.getEmail());
 				
 				rows = deletePreparedStatement.executeUpdate();
